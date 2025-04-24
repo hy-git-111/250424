@@ -1,5 +1,5 @@
 pipeline{
-    agnet any   // agent : 젠킨스 안에 도커를 또 만들려면 '도커 에이전트'로 입력해줘야함
+    agent any   // agent : 젠킨스 안에 도커를 또 만들려면 '도커 에이전트'로 입력해줘야함
 
     environment {
         JMETER_VERSION = "5.6.3"    // 설치한 JMeter 버전

@@ -1,0 +1,67 @@
+pipeline{
+    agnet any   // agent : 젠킨스 안에 도커를 또 만들려면 '도커 에이전트'로 입력해줘야함
+
+    environment {
+        JMETER_VERSION = "5.6.3"    // 설치한 JMeter 버전
+        JMETER_HOME = "/opt/jmeter/apache-jmeter-${JMETER_VERSION}" // 기본값
+
+    JTL_REPORT_FILE = "results/results.jtl"  // .jtl 생성 위치
+    HTML_REPORT_DIR = "report_output"    // .html 리포트 생성 위치
+    }
+
+    stages {
+        // 단계 입력, stage를 기준점으로 젠킨스 flos에 나타남, stage:steps = 1:1
+        stage ('Run Tests') {
+            steps { // 실행 내용
+                script {    // sh : 리눅스 명령어를 작성하겠다고 선언
+                    sh 'rm -rf results'    // rm : remove, rf : 폴더까지 삭제, f : 파일 삭제
+                    sh 'rm -f results.jtl'  // 파일 삭제
+                    sh 'rm -rf report_output'   // 폴더 삭제
+
+                    sh 'mkdir -p results'
+                    sh 'mkdir -p report_output'
+                    sh 'mkdir -p results/report_output'
+
+                    sh """
+                        echo "시작"
+                        ${env.JMETER_HOME}/bin/jmeter -n \\
+                        -t 250424_실습.jmx \\
+                        -l ./results/results.jtl \\
+                        -e -o ./results/report_output
+                    """
+                }
+            }
+        }
+
+        stage ('Publish Performance Report') {
+            steps {
+                perfReport(
+                    sources: "${env.JTL_REPORT_FILE}", 
+                    errorFailedThreshold: 1,
+                    errorUnstableThreshold: 0.5
+                )
+
+            }
+        }
+        stage ('HTML Repoer') {
+            steps {
+                publishHTML(
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: "${env.HTML_REPORT_DIR}",
+                    reportFiles: 'index.html',
+                    reportName: 'JMeter Performance Report'                    
+                )
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build finished.'
+            archiveArtifacts artifacts: "${env.HTML_REPORT_DIR}/**/*", allowEmptyArchive: true
+        }
+    }
+}
+

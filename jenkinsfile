@@ -26,8 +26,8 @@ pipeline{
                         echo "시작"
                         ${env.JMETER_HOME}/bin/jmeter -n \\
                         -t 250424_실습.jmx \\
-                        -l ./results/results.jtl \\
-                        -e -o ./results/report_output
+                        -l results/results.jtl \\
+                        -e -o report_output
                     """
                 }
             }

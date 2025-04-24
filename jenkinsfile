@@ -3,7 +3,8 @@ pipeline{
 
     environment {
         JMETER_VERSION = "5.6.3"    // 설치한 JMeter 버전
-        JMETER_HOME = "/opt/jmeter/apache-jmeter-${JMETER_VERSION}" // 기본값
+        JMETER_HOME = "/opt/jmeter" // 기본값
+        // JMETER_HOME = "/opt/jmeter/apache-jmeter-${JMETER_VERSION}" // 기본값
 
     JTL_REPORT_FILE = "results/results.jtl"  // .jtl 생성 위치
     HTML_REPORT_DIR = "report_output"    // .html 리포트 생성 위치
